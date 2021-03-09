@@ -256,33 +256,46 @@ __kernel void verthash_4w(__global uint2* io_hashes,
             uint2 uu3; \
             __asm ( \
             "s_nop 0\n" \
-            "s_nop 0\n" \
             "v_mov_b32_dpp  %[d0x], %[vx] quad_perm:[0,0,0,0]\n" \
             "v_mov_b32_dpp  %[d0y], %[vy] quad_perm:[0,0,0,0]\n" \
-            "v_mov_b32_dpp  %[d1x], %[vx] quad_perm:[1,1,1,1]\n" \
-            "v_mov_b32_dpp  %[d1y], %[vy] quad_perm:[1,1,1,1]\n" \
-            "v_mov_b32_dpp  %[d2x], %[vx] quad_perm:[2,2,2,2]\n" \
-            "v_mov_b32_dpp  %[d2y], %[vy] quad_perm:[2,2,2,2]\n" \
-            "v_mov_b32_dpp  %[d3x], %[vx] quad_perm:[3,3,3,3]\n" \
-            "v_mov_b32_dpp  %[d3y], %[vy] quad_perm:[3,3,3,3]\n" \
-            "s_nop 0\n" \
             "s_nop 0" \
             : [d0x] "=v" (uu0.x), \
-                [d0y] "=v" (uu0.y), \
-                [d1x] "=v" (uu1.x), \
-                [d1y] "=v" (uu1.y), \
-                [d2x] "=v" (uu2.x), \
-                [d2y] "=v" (uu2.y), \
-                [d3x] "=v" (uu3.x), \
-                [d3y] "=v" (uu3.y) \
+                [d0y] "=&v" (uu0.y)\
             : [vx] "v" (vvalue.x), \
                 [vy] "v" (vvalue.y)); \
             value_accumulator = fnv1a(value_accumulator, uu0.x); \
             value_accumulator = fnv1a(value_accumulator, uu0.y); \
+            __asm ( \
+            "s_nop 0\n" \
+            "v_mov_b32_dpp  %[d1x], %[vx] quad_perm:[1,1,1,1]\n" \
+            "v_mov_b32_dpp  %[d1y], %[vy] quad_perm:[1,1,1,1]\n" \
+            "s_nop 0" \
+            : [d1x] "=&v" (uu1.x), \
+                [d1y] "=&v" (uu1.y)\
+            : [vx] "v" (vvalue.x), \
+                [vy] "v" (vvalue.y)); \
             value_accumulator = fnv1a(value_accumulator, uu1.x); \
             value_accumulator = fnv1a(value_accumulator, uu1.y); \
+            __asm ( \
+            "s_nop 0\n" \
+            "v_mov_b32_dpp  %[d2x], %[vx] quad_perm:[2,2,2,2]\n" \
+            "v_mov_b32_dpp  %[d2y], %[vy] quad_perm:[2,2,2,2]\n" \
+            "s_nop 0" \
+            : [d2x] "=&v" (uu2.x), \
+                [d2y] "=&v" (uu2.y) \
+            : [vx] "v" (vvalue.x), \
+                [vy] "v" (vvalue.y)); \
             value_accumulator = fnv1a(value_accumulator, uu2.x); \
             value_accumulator = fnv1a(value_accumulator, uu2.y); \
+            __asm ( \
+            "s_nop 0\n" \
+            "v_mov_b32_dpp  %[d3x], %[vx] quad_perm:[3,3,3,3]\n" \
+            "v_mov_b32_dpp  %[d3y], %[vy] quad_perm:[3,3,3,3]\n" \
+            "s_nop 0" \
+            : [d3x] "=&v" (uu3.x), \
+                [d3y] "=&v" (uu3.y) \
+            : [vx] "v" (vvalue.x), \
+                [vy] "v" (vvalue.y)); \
             value_accumulator = fnv1a(value_accumulator, uu3.x); \
             value_accumulator = fnv1a(value_accumulator, uu3.y); \
         }
